@@ -491,7 +491,40 @@ async function submitForm(){
       return;
     }
   }
+  sendEmailNotification(payload);
   showSummary(payload);
+}
+
+function sendEmailNotification(payload){
+  const dest = 'guimonneau.ogu@gmail.com';
+  const sujet = encodeURIComponent('[SynapFlows] Nouvelle demande – ' + (payload.prenom || '') + ' ' + (payload.nom || '') + ' (' + (payload.societe || '') + ')');
+  const corps = encodeURIComponent(
+    'Nouvelle demande reçue via le formulaire SynapFlows\n' +
+    '================================================\n\n' +
+    'CONTACT\n' +
+    'Prénom : ' + (payload.prenom || '—') + '\n' +
+    'Nom : ' + (payload.nom || '—') + '\n' +
+    'Email : ' + (payload.email || '—') + '\n' +
+    'Téléphone : ' + (payload.telephone || '—') + '\n' +
+    'Entreprise : ' + (payload.societe || '—') + '\n' +
+    'Secteur : ' + (payload.secteur || '—') + '\n\n' +
+    'PROJET\n' +
+    'Type : ' + (payload.type_projet || '—') + '\n' +
+    'Description : ' + (payload.description || '—') + '\n' +
+    'Fonctionnalités : ' + (Array.isArray(payload.fonctions) ? payload.fonctions.join(', ') : (payload.fonctions || '—')) + '\n\n' +
+    'UTILISATEURS\n' +
+    'Volume au lancement : ' + (payload.users_launch || '—') + '\n' +
+    'Profils : ' + (Array.isArray(payload.profils) ? payload.profils.join(', ') : (payload.profils || '—')) + '\n\n' +
+    'DESIGN\n' +
+    'Ambiance : ' + (Array.isArray(payload.ambiance) ? payload.ambiance.join(', ') : (payload.ambiance || '—')) + '\n' +
+    'Références : ' + (payload.references || '—') + '\n' +
+    'Charte graphique : ' + (payload.charte || '—') + '\n\n' +
+    'BUDGET & DÉLAI\n' +
+    'Budget : ' + (payload.budget || '—') + '\n' +
+    'Délai : ' + (payload.delai || '—') + '\n\n' +
+    'Soumis le : ' + new Date().toLocaleString('fr-FR')
+  );
+  window.location.href = 'mailto:' + dest + '?subject=' + sujet + '&body=' + corps;
 }
 
 function line(label, value){
