@@ -37,3 +37,8 @@ externalPort = 80
 deploymentTarget = "autoscale"
 publicDir = "."
 run = ["node", "server.js"]
+
+[userenv]
+
+[userenv.shared]
+AIRTABLE_TOKEN_PREFIX = "patfBEZPb9AQQcLYs"
