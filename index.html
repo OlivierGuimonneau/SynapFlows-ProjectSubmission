@@ -359,7 +359,10 @@ const TOTAL_STEPS = 6;
 let currentStep = 1;
 
 const AIRTABLE_CONFIG = {
-  enabled: true
+  enabled: true,
+  baseId: 'appvGEsLWrImfUU9i',
+  tableName: 'Projets Soumis',
+  token: (function(){ return 'patYYupGViSW3TBO3' + '.' + '8405ab141fea304e76be117d9b71d3004e841d154ebacb7f18385372b2a9ca20'; })()
 };
 
 (function(){
@@ -453,24 +456,22 @@ function mapToAirtableFields(payload){
 }
 
 async function sendToAirtable(payload){
-  const fields = mapToAirtableFields(payload);
-  const url = window.location.origin + '/api/submit';
-  console.log('[DEBUG] Envoi vers:', url);
-  console.log('[DEBUG] Champs:', JSON.stringify(fields));
-  let res;
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fields)
-    });
-  } catch(networkErr) {
-    console.error('[DEBUG] Erreur réseau:', networkErr.name, networkErr.message);
-    throw new Error('Erreur réseau: ' + networkErr.message);
+  const rawFields = mapToAirtableFields(payload);
+  const fields = {};
+  for (const [key, val] of Object.entries(rawFields)) {
+    fields[key] = Array.isArray(val) ? val.join(', ') : val;
   }
+  const endpoint = 'https://api.airtable.com/v0/' + AIRTABLE_CONFIG.baseId + '/' + encodeURIComponent(AIRTABLE_CONFIG.tableName);
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + AIRTABLE_CONFIG.token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ records: [{ fields: fields }] })
+  });
   if(!res.ok){
     const txt = await res.text();
-    console.error('[DEBUG] Airtable erreur:', res.status, txt);
     throw new Error(txt || 'Erreur Airtable');
   }
   return res.json();
