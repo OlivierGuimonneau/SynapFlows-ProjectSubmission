@@ -56,6 +56,7 @@ const server = http.createServer((req, res) => {
       for (const [key, val] of Object.entries(payload)) {
         sanitized[key] = Array.isArray(val) ? val.join(', ') : val;
       }
+      console.log('[SUBMIT] Champs envoyés à Airtable:', JSON.stringify(sanitized, null, 2));
       const postData = JSON.stringify({ records: [{ fields: sanitized }] });
       const options = {
         hostname: 'api.airtable.com',
@@ -72,6 +73,7 @@ const server = http.createServer((req, res) => {
         let data = '';
         airtableRes.on('data', chunk => { data += chunk; });
         airtableRes.on('end', () => {
+          console.log('[AIRTABLE] Status:', airtableRes.statusCode, '| Réponse:', data.substring(0, 500));
           res.writeHead(airtableRes.statusCode, { 'Content-Type': 'application/json' });
           res.end(data);
         });
