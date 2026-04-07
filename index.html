@@ -454,14 +454,23 @@ function mapToAirtableFields(payload){
 
 async function sendToAirtable(payload){
   const fields = mapToAirtableFields(payload);
-  const res = await fetch('/api/submit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(fields)
-  });
-
+  const url = window.location.origin + '/api/submit';
+  console.log('[DEBUG] Envoi vers:', url);
+  console.log('[DEBUG] Champs:', JSON.stringify(fields));
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields)
+    });
+  } catch(networkErr) {
+    console.error('[DEBUG] Erreur réseau:', networkErr.name, networkErr.message);
+    throw new Error('Erreur réseau: ' + networkErr.message);
+  }
   if(!res.ok){
     const txt = await res.text();
+    console.error('[DEBUG] Airtable erreur:', res.status, txt);
     throw new Error(txt || 'Erreur Airtable');
   }
   return res.json();
@@ -479,8 +488,8 @@ async function submitForm(){
     try {
       await sendToAirtable(payload);
     } catch(err) {
-      console.error(err);
-      alert('La connexion Airtable a échoué. Vérifiez le Base ID, le nom de table, le token et les types de colonnes.');
+      console.error('[ERREUR SUBMIT]', err.name, err.message);
+      alert('La connexion Airtable a échoué:\n' + err.message);
       return;
     }
   }
