@@ -2,9 +2,12 @@ import https from 'https';
 
 // Mapper les champs du formulaire React vers les noms de colonnes Airtable
 function mapToAirtableFields(payload) {
-  // Formater la date pour Airtable (YYYY-MM-DD au lieu de timestamp ISO)
+  // Formater la date avec l'heure pour Airtable (YYYY-MM-DD HH:mm au lieu de timestamp ISO)
   const submittedDate = payload.submitted_at || new Date().toISOString();
+  const dateObj = new Date(submittedDate);
   const dateOnly = submittedDate.split('T')[0]; // "2026-04-07T13:42:18.392Z" -> "2026-04-07"
+  const time = dateObj.toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false });
+  const dateWithTime = `${dateOnly} ${time}`; // "2026-04-07 16:37"
 
   return {
     'Prénom': payload.prenom || '',
@@ -29,7 +32,7 @@ function mapToAirtableFields(payload) {
     'Budget': payload.budget || '',
     'Délai': payload.delai || '',
     'Informations complémentaires': payload.commentaire || '',
-    'Date de soumission': dateOnly,
+    'Date de soumission': dateWithTime,
     'Source': 'Formulaire site SynapFlows'
   };
 }

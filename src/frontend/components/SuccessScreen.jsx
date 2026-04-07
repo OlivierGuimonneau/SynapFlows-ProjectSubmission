@@ -15,8 +15,6 @@ export default function SuccessScreen({ formData }) {
     return val || '—';
   };
 
-  const handlePrint = () => window.print();
-
   return (
     <section className="success active">
       <div className="success-icon">
@@ -25,7 +23,8 @@ export default function SuccessScreen({ formData }) {
         </svg>
       </div>
       <h2>Demande envoyée</h2>
-      <p>Le projet est désormais préqualifié. Vous pouvez utiliser ce récapitulatif comme base pour préparer votre cahier des charges ou votre première proposition commerciale.</p>
+      <p>Votre projet nous est bien parvenu, une première réponse vous sera adressée au plus vite.</p>
+      <p style={{ fontSize: '0.95em', marginTop: '1rem', color: '#666' }}>L'équipe SynapFlows</p>
       
       <div className="summary">
         {lines('Contact', `${formData.prenom || ''} ${formData.nom || ''} · ${formData.email || ''}`)}
@@ -41,9 +40,7 @@ export default function SuccessScreen({ formData }) {
       </div>
 
       <div className="nav" style={{ justifyContent: 'center' }}>
-        <button className="btn btn-primary btn-lg" onClick={handlePrint}>
-          Imprimer / PDF
-        </button>
+        {/* Bouton impression supprimé */}
       </div>
     </section>
   );

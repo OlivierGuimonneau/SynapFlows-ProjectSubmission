@@ -79,11 +79,11 @@ export default function Step1({ data, onChange, onNext }) {
       </div>
 
       <div className="field">
-        <label>Entreprise <span className="req">*</span></label>
+        <label>Entreprise/Association <span className="req">*</span></label>
         <input
           type="text"
           name="societe"
-          placeholder="Nom de votre société"
+          placeholder="Nom de votre structure"
           value={data.societe || ''}
           onChange={handleChange}
         />

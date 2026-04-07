@@ -18,7 +18,8 @@ export default function Step6({ data, onChange, onPrev, onSubmit, loading }) {
           <label>Budget envisagé</label>
           <select name="budget" value={data.budget || ''} onChange={handleChange}>
             <option value="">— Sélectionner —</option>
-            <option>Moins de 5 000 €</option>
+            <option>Moins de 1 000 €</option>
+            <option>1 000 à 5 000 €</option>
             <option>5 000 à 15 000 €</option>
             <option>15 000 à 30 000 €</option>
             <option>30 000 € et plus</option>
@@ -49,8 +50,8 @@ export default function Step6({ data, onChange, onPrev, onSubmit, loading }) {
       </div>
 
       <div className="airtable-box">
-        <h3>Intégration Airtable prête</h3>
-        <p>Cette version est prête à envoyer les réponses dans Airtable. Il suffit de configurer les variables d'environnement AIRTABLE_BASE_ID et AIRTABLE_TOKEN.</p>
+        <h3>Vos données en sécurité</h3>
+        <p>Les informations que vous nous transmettez restent strictement confidentielles. Elles nous permettront de préparer une proposition adaptée à votre projet. Nous ne les partagerons avec aucun tiers sans votre consentement.</p>
       </div>
 
       <div className="nav">
