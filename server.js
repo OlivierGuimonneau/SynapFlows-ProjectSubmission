@@ -8,7 +8,9 @@ const PORT = 5000;
 
 const AIRTABLE_BASE_ID = 'appvGEsLWrImfUU9i';
 const AIRTABLE_TABLE = 'Projets Soumis';
-const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN_A && process.env.AIRTABLE_TOKEN_B
+  ? `${process.env.AIRTABLE_TOKEN_A}.${process.env.AIRTABLE_TOKEN_B}`
+  : process.env.AIRTABLE_TOKEN;
 
 function serveStatic(res, filePath, contentType) {
   fs.readFile(filePath, (err, data) => {

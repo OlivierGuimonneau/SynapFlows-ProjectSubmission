@@ -41,4 +41,3 @@ run = ["node", "server.js"]
 [userenv]
 
 [userenv.shared]
-AIRTABLE_TOKEN_PREFIX = "patfBEZPb9AQQcLYs"
