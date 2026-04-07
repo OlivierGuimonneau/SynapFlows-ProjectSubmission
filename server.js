@@ -51,7 +51,12 @@ const server = http.createServer((req, res) => {
         return;
       }
 
-      const postData = JSON.stringify({ records: [{ fields: payload }] });
+      // Convert any array values to comma-separated strings (Airtable text fields)
+      const sanitized = {};
+      for (const [key, val] of Object.entries(payload)) {
+        sanitized[key] = Array.isArray(val) ? val.join(', ') : val;
+      }
+      const postData = JSON.stringify({ records: [{ fields: sanitized }] });
       const options = {
         hostname: 'api.airtable.com',
         path: `/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE)}`,
