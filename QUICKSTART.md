@@ -1,103 +1,71 @@
-# ✅ Migration vers React + Express - Résumé
+# ⚡ Quick Start – 5 minutes
 
-## Qu'est-ce qui a été créé?
+Lance l'app en 5 étapes rapides.
 
-Votre formulaire SynapFlows a été complètement refactorisé vers une architecture moderne:
+## 1️⃣ Ouvrir le terminal
 
-### 📂 Structure du projet
-
-```
-src/frontend/                    # Application React
-├── App.jsx                      # Composant principal + gestion d'état
-├── App.css                      # Design system (variables CSS, thèmes light/dark)
-├── index.jsx                    # Point d'entrée React
-├── index.html                   # Template HTML
-└── components/                  # Composants réutilisables
-    ├── Header.jsx              # En-tête avec toggle thème
-    ├── Hero.jsx                # Section accueil
-    ├── Progress.jsx            # Barre de progression
-    ├── Form.jsx                # Gestionnaire de formulaire
-    ├── Footer.jsx              # Pied de page
-    ├── SuccessScreen.jsx       # Écran confirmation
-    └── steps/                  # Les 6 étapes du formulaire
-        ├── Step1.jsx           # Contact
-        ├── Step2.jsx           # Description projet
-        ├── Step3.jsx           # Fonctionnalités
-        ├── Step4.jsx           # Utilisateurs & données
-        ├── Step5.jsx           # Design
-        └── Step6.jsx           # Budget & délai
-
-backend/                         # Serveur Node.js
-├── index.js                     # Serveur Express principal
-├── routes/
-│   └── submit.js               # API POST /api/submit
-└── services/
-    └── airtable.js             # Service intégration Airtable
-
-Configuration
-├── package.json                # Dépendances npm
-├── vite.config.js              # Configuration Vite
-├── .env.example                # Template variables d'env
-├── .env                        # Votre config locale
-├── .gitignore                  # Fichiers ignorés
-└── README.md                   # Documentation principale
+```bash
+cd d:\SynapFlows-ProjectSubmission
 ```
 
-## 🚀 Démarrage rapide
+## 2️⃣ Installer les dépendances
 
-### 1. Installer les dépendances
 ```bash
 npm install
 ```
+(Attendre 2-5 min)
 
-### 2. Configurer Airtable
-Créez un fichier `.env` à la racine:
+## 3️⃣ Créer `.env`
+
+À la racine du projet, créer un fichier `.env`:
+
 ```bash
 AIRTABLE_BASE_ID=appvGEsLWrImfUU9i
 AIRTABLE_TABLE=Projets Soumis
-AIRTABLE_TOKEN=votre_token_ici
-PORT=5000
+AIRTABLE_TOKEN=patXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+PORT=5001
 NODE_ENV=development
 ```
 
-### 3. Lancer l'application
+**Valeurs à remplacer:**
+- `appvGEsLWrImfUU9i` → Votre BASE_ID (depuis URL Airtable: `airtable.com/{BASE_ID}/...`)
+- `patXXX...` → Votre token API (générer sur https://airtable.com/account/tokens)
+
+## 4️⃣ Lancer
+
 ```bash
 npm run dev
 ```
 
-Accédez à: **http://localhost:5000**
+Attendre les messages:
+```
+VITE ready in ... ms
+✅ Serveur lancé sur http://localhost:5001
+```
 
-## 📝 Fichiers de documentation
+## 5️⃣ Ouvrir dans le navigateur
 
-| Fichier | But |
-|---------|-----|
-| **README.md** | Documentation complète + architecture |
-| **SETUP.md** | Guide pas-à-pas d'installation |
-| **MIGRATION_NOTES.md** | Avant/après + améliorations |
-| **Ce fichier** | Résumé du projet |
+**http://localhost:5174**
 
-## 🎨 Améliorations apportées
+---
 
-✅ **Architecture modulaire**: Code React structuré en composants  
-✅ **État managé**: React Hooks pour gestion d'état claire  
-✅ **Build optimisé**: Vite pour développement 10x plus rapide  
-✅ **Thème clair/sombre**: Support natif du mode sombre  
-✅ **Variables CSS**: Design system cohérent et maintenable  
-✅ **Responsive**: Compatible mobile, tablette, desktop  
-✅ **Séparation frontend/backend**: Plus facile à tester et déployer  
-✅ **Sécurité**: Variables d'env, pas de secrets en dur  
+## ✅ Tester
 
-## 📦 Stack technologique
+Remplir le formulaire et cliquer "Envoyer la demande" → Vérifier dans Airtable
 
-**Frontend:**
-- React 18.2 - Framework UI
-- Vite 5 - Build tool ultra-rapide
-- CSS3 - Styles avec variables CSS
+---
 
-**Backend:**
-- Node.js - Runtime server
-- Express 4.18 - Framework web
-- HTTPS natif - Appels API Airtable
+## ❌ Erreurs?
+
+- **Port déjà utilisé?** → Changer `PORT=5002` dans `.env`
+- **Airtable 404?** → Vérifier BASE_ID et token dans `.env`
+- **Vite ne démarre pas?** → Relancer: `npm run dev`
+
+Voir [SETUP.md](SETUP.md) pour le dépannage complet.
+
+---
+
+**c'est bon!** 🎉
 
 **API:**
 - Airtable REST API - Base de données
