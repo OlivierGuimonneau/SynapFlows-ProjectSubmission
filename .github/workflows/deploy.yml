@@ -1,28 +1,32 @@
-name: Deploy SynapFlows Production
-
+name: Deploy SynapFlows
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Permet déclenchement manuel
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Deploy to VPS
+    - uses: actions/checkout@v4
+    
+    - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: true
         script: |
-          cd ${{ secrets.VPS_PATH }}
+          set -e
+          cd ${{ secrets.VPS_PATH }} || { echo "Dossier non trouvé"; exit 1; }
+          echo "Pull depuis GitHub..."
           git pull origin main
+          echo "Build image..."
           docker compose build --no-cache
+          echo "Restart service..."
           docker compose up -d --force-recreate
+          echo "Status..."
           docker compose ps
-          docker compose logs synapflows --tail 20
+          echo "Logs..."
+          docker compose logs synapflows --tail 15
