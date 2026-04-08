@@ -32,8 +32,8 @@ SynapFlows-ProjectSubmission/
 │       ├── 📂 public/                 • Assets statiques source
 │       │   └── 📂 assets/
 │       │       └── 📂 images/
-│       │           ├── logo-synapflows.png       (logo en-tête)
-│       │           └── Icone_Synapflows.png      (favicon)
+       │           ├── favicon.png             (icône browser tab)
+       │           └── logo-synapflows.png     (logo en-tête)
 │       │
 │       ├── 📂 components/             • Composants réutilisables
 │       │   ├── Header.jsx             • En-tête + toggle thème
@@ -262,18 +262,18 @@ npm run preview          # Preview build Vite (sans serveur)
 
 ## 🖼️ Gestion des images
 
-### Stockage des assets
-
 **Source (développement):**
 ```
 src/frontend/public/assets/images/
-├── logo-synapflows.png        • Logo en-tête (48px hauteur)
-└── Icone_Synapflows.png       • Favicon browser (32x32px)
+├── favicon.png           • Icône browser tab (32×32px)
+└── logo-synapflows.png   • Logo en-tête (48px hauteur)
 ```
 
 **Build (production):**
 ```
-public/assets/images/          • Généré par Vite depuis src/frontend/public/
+public/assets/images/    • Généré par Vite depuis src/frontend/public/
+├── favicon.png
+└── logo-synapflows.png
 ```
 
 ### Utilisation dans le code

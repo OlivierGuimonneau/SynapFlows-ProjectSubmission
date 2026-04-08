@@ -13,14 +13,14 @@ SynapFlows-ProjectSubmission/
 │   └── public/                    ← SOURCE (développement)
 │       └── assets/
 │           └── images/
-│               ├── logo-synapflows.png
-│               └── Icone_Synapflows.png
+│               ├── favicon.png
+│               └── logo-synapflows.png
 │
 └── public/                        ← BUILD OUTPUT (production)
     └── assets/
         └── images/
-            ├── logo-synapflows.png
-            └── Icone_Synapflows.png
+            ├── favicon.png
+            └── logo-synapflows.png
 ```
 
 ---
@@ -37,8 +37,8 @@ d:\SynapFlows-ProjectSubmission\src\frontend\public\assets\images\
 ```
 
 **Fichiers:**
+- `favicon.png` - Favicon pour le browser tab (32×32px)
 - `logo-synapflows.png` - Logo de l'en-tête (48px hauteur recommandée)
-- `Icone_Synapflows.png` - Favicon pour le browser tab
 
 **Format:**
 - PNG avec transparence et compression optimale
