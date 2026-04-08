@@ -13,7 +13,7 @@ export default function Header() {
     <header className="site-header">
       <div className="brand">
         <img src="/assets/images/logo-synapflows.png" alt="Logo SynapFlows" />
-        <div className="brand-note">Formulaire de qualification projet</div>
+        <div className="brand-note">Qualification de projet</div>
       </div>
       <button className="theme-toggle" onClick={toggleTheme} aria-label="Changer de thème">
         {theme === 'dark' ? (
