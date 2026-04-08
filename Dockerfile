@@ -7,8 +7,8 @@ WORKDIR /usr/src/app
 # Copier les fichiers de dépendances en premier (optimisation du cache Docker)
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm install --omit=dev
+# Installer les dépendances en ignorant les conflits de peer dependencies
+RUN npm install --omit=dev --legacy-peer-deps
 
 # Copier tout le reste du code source
 COPY . .
