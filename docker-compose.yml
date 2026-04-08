@@ -10,9 +10,12 @@ services:
       - n8n-https_default
     labels:
       - "traefik.enable=true"
+      # Attention aux BACKTICKS (`) ici :
       - "traefik.http.routers.synapflows.rule=Host(`project.synapflows.fr`)"
       - "traefik.http.routers.synapflows.entrypoints=websecure"
       - "traefik.http.routers.synapflows.tls.certresolver=myresolver"
+      # Forcer Traefik à utiliser ce réseau pour communiquer avec le conteneur
+      - "traefik.docker.network=n8n-https_default"
       - "traefik.http.services.synapflows.loadbalancer.server.port=5000"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000 || exit 1"]
