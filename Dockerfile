@@ -1,20 +1,22 @@
 # Utiliser une image Node.js officielle et légère
 FROM node:20-alpine
 
-# Créer et définir le dossier de travail dans le conteneur
 WORKDIR /usr/src/app
 
-# Copier les fichiers de dépendances en premier (optimisation du cache Docker)
+# Copier les fichiers de dépendances
 COPY package*.json ./
 
-# Installer les dépendances en ignorant les conflits de peer dependencies
-RUN npm install --omit=dev --legacy-peer-deps
+# 1. Installer TOUTES les dépendances (y compris Vite pour le build)
+RUN npm install --legacy-peer-deps
 
-# Copier tout le reste du code source
+# Copier tout le code source
 COPY . .
 
-# Exposer le port que ton app utilise (5000 d'après ton docker-compose)
+# 2. Construire l'application (Vite va générer les fichiers statiques)
+RUN npm run build
+
+# Exposer le port que ton app utilise
 EXPOSE 5000
 
-# Commande pour démarrer l'application
-CMD ["npm", "start"]
+# 3. Lancer UNIQUEMENT le serveur (adapte si "server:dev" est la seule commande de run)
+CMD ["npm", "run", "server:dev"]
