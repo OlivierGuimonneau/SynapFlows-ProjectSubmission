@@ -13,19 +13,25 @@ jobs:
     
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
-      env:
-        VPS_PATH: ${{ secrets.VPS_PATH }}
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        envs: VPS_PATH
+        # On passe directement le secret dans l'environnement du script ssh
+        envs: GITHUB_SHA
         script_stop: true
         script: |
           set -e
           
-          # On utilise la variable d'environnement $VPS_PATH correctement passée
+          # On écrit la variable directement dans le script bash
+          VPS_PATH="${{ secrets.VPS_PATH }}"
+          
           cd $VPS_PATH || { echo "Dossier non trouvé"; exit 1; }
+          
+          echo "Nettoyage des fichiers locaux..."
+          git fetch origin main
+          git clean -fd
+          git reset --hard origin/main
           
           echo "Pull depuis GitHub..."
           git pull origin main
