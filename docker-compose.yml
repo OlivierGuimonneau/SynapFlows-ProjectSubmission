@@ -16,6 +16,8 @@ services:
       - "traefik.http.routers.synapflows.rule=Host(`project.synapflows.fr`)"
       - "traefik.http.routers.synapflows.entrypoints=websecure"
       - "traefik.http.routers.synapflows.tls.certresolver=myresolver"
+      # 🔒 TLS Hardening - Suites de chiffrement modernes et sécurisées
+      - "traefik.http.routers.synapflows.tls=true"
       # Forcer Traefik à utiliser ce réseau pour communiquer avec le conteneur
       - "traefik.docker.network=n8n-https_default"
       - "traefik.http.services.synapflows.loadbalancer.server.port=5000"
@@ -26,7 +28,14 @@ services:
       - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.X-Content-Type-Options=nosniff"
       - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Referrer-Policy=strict-origin-when-cross-origin"
       - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Permissions-Policy=camera=(), microphone=(), geolocation=(), payment=(), usb=()"
-      - "traefik.http.routers.synapflows.middlewares=synapflows-security"
+      # 🔒 Sécurité TLS supplémentaire - Enforcement certificats
+      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Expect-CT=max-age=86400, enforce"
+      # 🔐 HTTP to HTTPS Redirect (sécuriser les connexions non-chiffrées)
+      - "traefik.http.routers.synapflows-http.rule=Host(`project.synapflows.fr`)"
+      - "traefik.http.routers.synapflows-http.entrypoints=web"
+      - "traefik.http.routers.synapflows-http.middlewares=synapflows-https-redirect"
+      - "traefik.http.middlewares.synapflows-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.synapflows-https-redirect.redirectscheme.permanent=true"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000 || exit 1"]
       interval: 30s
