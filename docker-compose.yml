@@ -19,6 +19,14 @@ services:
       # Forcer Traefik à utiliser ce réseau pour communiquer avec le conteneur
       - "traefik.docker.network=n8n-https_default"
       - "traefik.http.services.synapflows.loadbalancer.server.port=5000"
+      # 🔒 Middleware de sécurité - redéclarer les en-têtes
+      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Content-Security-Policy=default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com; frame-ancestors 'none';"
+      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Strict-Transport-Security=max-age=31536000; includeSubDomains; preload"
+      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.X-Frame-Options=DENY"
+      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.X-Content-Type-Options=nosniff"
+      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Referrer-Policy=strict-origin-when-cross-origin"
+      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Permissions-Policy=camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+      - "traefik.http.routers.synapflows.middlewares=synapflows-security"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000 || exit 1"]
       interval: 30s
