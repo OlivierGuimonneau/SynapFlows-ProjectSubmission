@@ -20,7 +20,7 @@ export default function FormPage() {
     setFormData(prev => ({ ...prev, ...newData }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (reCaptchaToken) => {
     const required = ['prenom', 'nom', 'email', 'societe', 'type_projet', 'description'];
     const missing = required.filter(k => !formData[k] || formData[k] === '');
     
@@ -29,10 +29,16 @@ export default function FormPage() {
       return;
     }
 
+    if (!reCaptchaToken) {
+      alert('Erreur de validation reCAPTCHA. Veuillez réessayer.');
+      return;
+    }
+
     setLoading(true);
     try {
       const payload = {
         ...formData,
+        reCaptchaToken,
         submitted_at: new Date().toISOString()
       };
 

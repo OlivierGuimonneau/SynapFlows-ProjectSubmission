@@ -1,7 +1,54 @@
 import express from 'express';
+import axios from 'axios';
 import { submitToAirtable } from '../services/airtable.js';
 
 const router = express.Router();
+
+// 🔐 Fonction de validation reCAPTCHA v3
+async function verifyRecaptcha(token) {
+  // 🔧 EN DÉVELOPPEMENT: bypass reCAPTCHA pour tester localement
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[reCAPTCHA] Mode DÉVELOPPEMENT - Validation contournée');
+    return { success: true, score: 0.9, action: 'submit_form' };
+  }
+
+  if (!token) {
+    throw new Error('Token reCAPTCHA manquant');
+  }
+
+  try {
+    console.log('[reCAPTCHA DEBUG] Token reçu:', token.substring(0, 50) + '...');
+    console.log('[reCAPTCHA DEBUG] Clé secrète disponible:', !!process.env.RECAPTCHA_SECRET_KEY);
+
+    const response = await axios.post(
+      'https://www.google.com/recaptcha/api/siteverify',
+      {
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: token
+      }
+    );
+
+    console.log('[reCAPTCHA DEBUG] Réponse Google:', response.data);
+
+    const { success, score, action, challenge_ts, hostname } = response.data;
+
+    console.log('[reCAPTCHA] Résultat:', { success, score, action, hostname });
+
+    // reCAPTCHA v3 retourne un score entre 0.0 et 1.0
+    // 1.0 = très probable que ce soit un utilisateur légitime
+    // 0.0 = très probable que ce soit un bot
+    // Seuil recommandé: 0.5
+    if (!success || score < 0.5) {
+      throw new Error(`reCAPTCHA validation échouée (score: ${score})`);
+    }
+
+    return { success: true, score, action };
+  } catch (error) {
+    console.error('[reCAPTCHA ERROR] Message:', error.message);
+    console.error('[reCAPTCHA ERROR] Stack:', error.stack);
+    throw new Error('Échec de la vérification reCAPTCHA');
+  }
+}
 
 // 📋 Schéma de validation des champs du formulaire
 const FORM_SCHEMA = {
@@ -101,13 +148,31 @@ router.post('/', validateOrigin, async (req, res) => {
   try {
     const payload = req.body;
 
+    console.log('[SUBMIT DEBUG] Clés du payload reçu:', Object.keys(payload));
+
     // Vérifier données présentes
     if (!payload || Object.keys(payload).length === 0) {
       return res.status(400).json({ error: 'Aucune donnée fournie' });
     }
 
+    // 🔐 Vérifier le token reCAPTCHA en premier
+    const reCaptchaToken = payload.reCaptchaToken;
+    console.log('[SUBMIT DEBUG] Token reCAPTCHA présent:', !!reCaptchaToken);
+    
+    try {
+      await verifyRecaptcha(reCaptchaToken);
+      console.log('[SECURITY] reCAPTCHA validé avec succès');
+    } catch (error) {
+      console.warn('[SECURITY] reCAPTCHA validation échouée:', error.message);
+      return res.status(403).json({ error: error.message });
+    }
+
+    // Nettoyer le payload (enlever le token reCAPTCHA avant validation Airtable)
+    const cleanPayload = { ...payload };
+    delete cleanPayload.reCaptchaToken;
+
     // Valider les champs
-    const validationErrors = validateFormData(payload);
+    const validationErrors = validateFormData(cleanPayload);
     if (validationErrors.length > 0) {
       console.warn('[VALIDATION ERROR]', validationErrors);
       return res.status(400).json({ 
@@ -117,7 +182,7 @@ router.post('/', validateOrigin, async (req, res) => {
     }
 
     // ✅ Soumission valide
-    await submitToAirtable(payload);
+    await submitToAirtable(cleanPayload);
     
     // 🔐 NE PAS retourner la réponse brute d'Airtable
     // Répondre simplement avec succès (pas de données sensibles)

@@ -1,9 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 export default function Step6({ data, onChange, onPrev, onSubmit, loading }) {
+  const { executeRecaptcha } = useGoogleReCaptcha();
+  const [reCaptchaToken, setReCaptchaToken] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     onChange({ [name]: value });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!executeRecaptcha) {
+        console.log('Execute recaptcha not yet available');
+        return;
+      }
+      const token = await executeRecaptcha('submit_form');
+      setReCaptchaToken(token);
+      // Passer le token au callback onSubmit
+      onSubmit(token);
+    } catch (error) {
+      console.error('reCAPTCHA error:', error);
+    }
   };
 
   return (
@@ -61,7 +80,7 @@ export default function Step6({ data, onChange, onPrev, onSubmit, loading }) {
         <button
           type="button"
           className="btn btn-primary btn-lg"
-          onClick={onSubmit}
+          onClick={handleSubmit}
           disabled={loading}
         >
           {loading ? 'Envoi en cours...' : 'Envoyer la demande'}

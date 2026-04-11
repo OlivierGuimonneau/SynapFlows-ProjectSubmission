@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   // En mode Report-Only durant 48-72h pour détecter les violations sans casser la fonctionnalité
   res.setHeader(
     'Content-Security-Policy-Report-Only',
-    "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com; frame-ancestors 'none'; report-uri /api/csp-report;"
+    "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; frame-src https://www.google.com/recaptcha/; frame-ancestors 'none'; report-uri /api/csp-report;"
   );
   
   // Strict-Transport-Security (HSTS) - force HTTPS
@@ -109,7 +109,13 @@ app.post('/api/csp-report', express.json({ type: 'application/csp-report' }), (r
 });
 
 // 🚦 API Routes sécurisées avec rate limiting
-app.use('/api/submit', submitLimiter, submitRoute);
+try {
+  app.use('/api/submit', submitLimiter, submitRoute);
+  console.log('✅ Route /api/submit enregistrée avec succès');
+} catch (error) {
+  console.error('❌ Erreur lors du chargement de la route /api/submit:', error);
+  process.exit(1);
+}
 
 // Servir les fichiers statiques (en dev et prod)
 app.use(express.static(path.join(__dirname, '../public')));
@@ -127,6 +133,22 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erreur serveur' });
 });
 
+console.log('[STARTUP] Démarrage du serveur sur port', PORT);
+
 app.listen(PORT, () => {
   console.log(`✅ Serveur SynapFlows lancé sur http://localhost:${PORT}`);
+}).on('error', (err) => {
+  console.error('❌ ERREUR LISTEN:', err);
+  process.exit(1);
+});
+
+// Capture des exceptions non gérées
+process.on('uncaughtException', (err) => {
+  console.error('❌ UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ UNHANDLED REJECTION:', reason);
+  process.exit(1);
 });
