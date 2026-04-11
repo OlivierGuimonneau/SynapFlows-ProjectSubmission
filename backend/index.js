@@ -32,7 +32,7 @@ app.use((req, res, next) => {
   // En mode Report-Only durant 48-72h pour détecter les violations sans casser la fonctionnalité
   res.setHeader(
     'Content-Security-Policy-Report-Only',
-    "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; frame-src https://www.google.com/recaptcha/; frame-ancestors 'none'; report-uri /api/csp-report;"
+    "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://recaptcha.net/ https://cdn.jsdelivr.net/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; img-src 'self' data: https:; font-src 'self' https: https://fonts.gstatic.com/; connect-src 'self' https://api.airtable.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://recaptcha.net/ https://www.google.com/recaptcha/api/ https://www.gstatic.com/ https://fonts.googleapis.com/ https://fonts.gstatic.com/; frame-src https://www.google.com/recaptcha/ https://recaptcha.net/; frame-ancestors 'none'; report-uri /api/csp-report;"
   );
   
   // Strict-Transport-Security (HSTS) - force HTTPS
