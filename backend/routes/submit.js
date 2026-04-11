@@ -175,12 +175,19 @@ router.post('/', validateOrigin, async (req, res) => {
     // 🔐 Vérifier le token reCAPTCHA en premier
     const reCaptchaToken = payload.reCaptchaToken;
     console.log('[SUBMIT DEBUG] Token reCAPTCHA présent:', !!reCaptchaToken);
+    console.log('[SUBMIT DEBUG] Token reCAPTCHA (first 50 chars):', reCaptchaToken?.substring(0, 50));
+    console.log('[SUBMIT DEBUG] Token reCAPTCHA (length):', reCaptchaToken?.length);
+    
+    if (!reCaptchaToken) {
+      console.error('[SECURITY] Token reCAPTCHA manquant!');
+      return res.status(403).json({ error: 'Token reCAPTCHA manquant' });
+    }
     
     try {
       await verifyRecaptcha(reCaptchaToken);
       console.log('[SECURITY] reCAPTCHA validé avec succès');
     } catch (error) {
-      console.warn('[SECURITY] reCAPTCHA validation échouée:', error.message);
+      console.error('[SECURITY] reCAPTCHA validation échouée:', error.message);
       return res.status(403).json({ error: error.message });
     }
 

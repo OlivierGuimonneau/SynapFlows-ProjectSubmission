@@ -30,9 +30,13 @@ export default function FormPage() {
     }
 
     if (!reCaptchaToken) {
-      alert('Erreur de validation reCAPTCHA. Veuillez réessayer.');
+      console.error('[FormPage] Token reCAPTCHA manquant!');
+      alert('Erreur: Token reCAPTCHA manquant. Veuillez réessayer.');
       return;
     }
+
+    console.log('[FormPage] Token reCAPTCHA reçu, longueur:', reCaptchaToken.length);
+    console.log('[FormPage] Envoi du payload...');
 
     setLoading(true);
     try {
@@ -42,20 +46,26 @@ export default function FormPage() {
         submitted_at: new Date().toISOString()
       };
 
+      console.log('[FormPage] Clés du payload:', Object.keys(payload));
+      console.log('[FormPage] Token présent dans payload:', 'reCaptchaToken' in payload);
+
       const response = await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
+      console.log('[FormPage] Réponse status:', response.status);
+
       if (!response.ok) {
         const error = await response.json();
+        console.error('[FormPage] Erreur API:', error);
         throw new Error(error.error || 'Erreur lors de la soumission');
       }
 
       setSubmitted(true);
     } catch (error) {
-      console.error('[ERREUR SUBMIT]', error);
+      console.error('[FormPage ERREUR SUBMIT]', error);
       alert('Erreur: ' + error.message);
     } finally {
       setLoading(false);
