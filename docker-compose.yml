@@ -22,7 +22,7 @@ services:
       - "traefik.docker.network=n8n-https_default"
       - "traefik.http.services.synapflows.loadbalancer.server.port=5000"
       # 🔒 Middleware de sécurité - redéclarer les en-têtes (mode Report-Only)
-      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Content-Security-Policy-Report-Only=default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com; frame-ancestors 'none'; report-uri /api/csp-report;"
+      - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Content-Security-Policy-Report-Only=default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; frame-src https://www.google.com/recaptcha/; frame-ancestors 'none'; report-uri /api/csp-report;"
       - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.Strict-Transport-Security=max-age=31536000; includeSubDomains; preload"
       - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.X-Frame-Options=DENY"
       - "traefik.http.middlewares.synapflows-security.headers.customResponseHeaders.X-Content-Type-Options=nosniff"
