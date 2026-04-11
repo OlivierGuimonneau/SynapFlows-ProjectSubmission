@@ -24,8 +24,12 @@ console.log('==========================================\n');
 
 // 🔒 Middleware de sécurité HTTP (en-têtes essentiels)
 app.use((req, res, next) => {
-  // Content-Security-Policy (CSP) - restrictive par défaut
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com; frame-ancestors 'none';");
+  // Content-Security-Policy-Report-Only (mode observation, non-bloquant)
+  // En mode Report-Only durant 48-72h pour détecter les violations sans casser la fonctionnalité
+  res.setHeader(
+    'Content-Security-Policy-Report-Only',
+    "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com; frame-ancestors 'none'; report-uri /api/csp-report;"
+  );
   
   // Strict-Transport-Security (HSTS) - force HTTPS
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
@@ -73,6 +77,24 @@ app.get('/api/config-test', (req, res) => {
     nodeEnv: process.env.NODE_ENV,
     port: PORT
   });
+});
+
+// 📊 Endpoint CSP Report-Only - Collecte les violations CSP
+// Les navigateurs envoient les violations CSP à cet endpoint (mode rapport, non-bloquant)
+app.post('/api/csp-report', express.json({ type: 'application/csp-report' }), (req, res) => {
+  const report = req.body['csp-report'] || req.body;
+  
+  console.log('\n[CSP VIOLATION REPORT]');
+  console.log('Timestamp:', new Date().toISOString());
+  console.log('Blocked URI:', report['blocked-uri'] || 'N/A');
+  console.log('Violation Type:', report['violated-directive'] || 'N/A');
+  console.log('Original Policy:', report['original-policy'] || 'N/A');
+  console.log('Source File:', report['source-file'] || 'N/A');
+  console.log('Line Number:', report['line-number'] || 'N/A');
+  console.log('----\n');
+  
+  // Répondre avec 204 No Content (standard pour CSP reports)
+  res.status(204).send();
 });
 
 // API Routes
