@@ -22,8 +22,44 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('PORT:', PORT);
 console.log('==========================================\n');
 
-// Middleware
-app.use(cors());
+// 🔒 Middleware de sécurité HTTP (en-têtes essentiels)
+app.use((req, res, next) => {
+  // Content-Security-Policy (CSP) - restrictive par défaut
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://api.airtable.com; frame-ancestors 'none';");
+  
+  // Strict-Transport-Security (HSTS) - force HTTPS
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  
+  // Anti-clickjacking - refuse framing
+  res.setHeader('X-Frame-Options', 'DENY');
+  
+  // Masquer Express version (sécurité par obscurité)
+  res.removeHeader('X-Powered-By');
+  
+  // MIME sniffing protection
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  
+  // Referrer-Policy - limite l'exposition du Referer
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Permissions-Policy - restreint les APIs navigateur
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  
+  next();
+});
+
+// Middleware CORS restrictif
+const allowedOrigins = isDev 
+  ? ['http://localhost:5000', 'http://localhost:5174', 'http://127.0.0.1:5000', 'http://127.0.0.1:5174']
+  : ['https://project.synapflows.fr'];
+
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
@@ -42,11 +78,11 @@ app.get('/api/config-test', (req, res) => {
 // API Routes
 app.use('/api/submit', submitRoute);
 
-// En production, servir les fichiers statiques depuis /public
+// Servir les fichiers statiques (en dev et prod)
+app.use(express.static(path.join(__dirname, '../public')));
+
+// En production, serve index.html pour SPA fallback
 if (!isDev) {
-  app.use(express.static(path.join(__dirname, '../public')));
-  
-  // Serve index.html for all non-API routes (SPA fallback)
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
   });
