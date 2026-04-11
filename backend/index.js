@@ -13,6 +13,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 5000;
 const isDev = process.env.NODE_ENV === 'development';
 
+// 🔒 Trust proxy - Traefik/Nginx passe X-Forwarded-For
+app.set('trust proxy', 1);
+
 // Log configuration au démarrage
 console.log('\n========== Configuration Airtable ==========');
 console.log('BASE_ID:', process.env.AIRTABLE_BASE_ID);

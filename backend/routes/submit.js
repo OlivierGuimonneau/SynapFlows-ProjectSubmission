@@ -6,6 +6,12 @@ const router = express.Router();
 
 // 🔐 Fonction de validation reCAPTCHA v3
 async function verifyRecaptcha(token) {
+  // 🔧 BYPASS: utilisez RECAPTCHA_BYPASS=true pour tester sans limitation reCAPTCHA
+  if (process.env.RECAPTCHA_BYPASS === 'true') {
+    console.log('[reCAPTCHA] BYPASS activé - Validation contournée');
+    return { success: true, score: 0.9, action: 'submit_form' };
+  }
+
   // 🔧 EN DÉVELOPPEMENT: bypass reCAPTCHA pour tester localement
   if (process.env.NODE_ENV === 'development') {
     console.log('[reCAPTCHA] Mode DÉVELOPPEMENT - Validation contournée');
@@ -13,11 +19,12 @@ async function verifyRecaptcha(token) {
   }
 
   if (!token) {
+    console.error('[reCAPTCHA] Token manquant');
     throw new Error('Token reCAPTCHA manquant');
   }
 
   try {
-    console.log('[reCAPTCHA DEBUG] Token reçu:', token.substring(0, 50) + '...');
+    console.log('[reCAPTCHA DEBUG] Vérification du token...');
     console.log('[reCAPTCHA DEBUG] Clé secrète disponible:', !!process.env.RECAPTCHA_SECRET_KEY);
 
     const response = await axios.post(
@@ -25,10 +32,11 @@ async function verifyRecaptcha(token) {
       {
         secret: process.env.RECAPTCHA_SECRET_KEY,
         response: token
-      }
+      },
+      { timeout: 5000 }
     );
 
-    console.log('[reCAPTCHA DEBUG] Réponse Google:', response.data);
+    console.log('[reCAPTCHA DEBUG] ✅ Réponse Google reçue:', JSON.stringify(response.data));
 
     const { success, score, action, challenge_ts, hostname } = response.data;
 
@@ -38,15 +46,24 @@ async function verifyRecaptcha(token) {
     // 1.0 = très probable que ce soit un utilisateur légitime
     // 0.0 = très probable que ce soit un bot
     // Seuil recommandé: 0.5
-    if (!success || score < 0.5) {
-      throw new Error(`reCAPTCHA validation échouée (score: ${score})`);
+    if (!success) {
+      console.error('[reCAPTCHA] Google a rejeté le token:', response.data);
+      throw new Error(`Google a rejeté le token: ${JSON.stringify(response.data)}`);
     }
 
+    if (score < 0.5) {
+      console.warn('[reCAPTCHA] Score trop bas:', score);
+      throw new Error(`Score reCAPTCHA insuffisant (${score}). Le domaine ou la clé peut ne pas être configuré correctement.`);
+    }
+
+    console.log('[reCAPTCHA] ✅ Validé avec succès (score: ' + score + ')');
     return { success: true, score, action };
   } catch (error) {
     console.error('[reCAPTCHA ERROR] Message:', error.message);
-    console.error('[reCAPTCHA ERROR] Stack:', error.stack);
-    throw new Error('Échec de la vérification reCAPTCHA');
+    if (error.response) {
+      console.error('[reCAPTCHA ERROR] Réponse:', error.response.data);
+    }
+    throw new Error('Échec de la vérification reCAPTCHA: ' + error.message);
   }
 }
 
