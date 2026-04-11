@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 import submitRoute from './routes/submit.js';
 
 dotenv.config();
@@ -64,6 +65,16 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
+// 🚦 Rate Limiting pour /api/submit
+// 10 soumissions par IP par 15 minutes (standard pour formulaires)
+const submitLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 requêtes
+  message: 'Trop de soumissions depuis cette IP. Essayez à nouveau dans 15 minutes.',
+  standardHeaders: true, // Retourne info limite dans `RateLimit-*` headers
+  legacyHeaders: false // Désactiver `X-RateLimit-*` headers
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
@@ -97,8 +108,8 @@ app.post('/api/csp-report', express.json({ type: 'application/csp-report' }), (r
   res.status(204).send();
 });
 
-// API Routes
-app.use('/api/submit', submitRoute);
+// 🚦 API Routes sécurisées avec rate limiting
+app.use('/api/submit', submitLimiter, submitRoute);
 
 // Servir les fichiers statiques (en dev et prod)
 app.use(express.static(path.join(__dirname, '../public')));
