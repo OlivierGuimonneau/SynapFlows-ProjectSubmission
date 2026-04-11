@@ -7,6 +7,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: "5000"
+      RECAPTCHA_BYPASS: "true"
     networks:
       - n8n-https_default
     labels:

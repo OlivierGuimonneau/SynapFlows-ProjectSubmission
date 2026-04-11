@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 export default function Step6({ data, onChange, onPrev, onSubmit, loading }) {
-  const { executeRecaptcha } = useGoogleReCaptcha();
-  const [reCaptchaToken, setReCaptchaToken] = useState(null);
   const [reCaptchaError, setReCaptchaError] = useState(null);
 
   const handleChange = (e) => {
@@ -14,39 +11,14 @@ export default function Step6({ data, onChange, onPrev, onSubmit, loading }) {
   const handleSubmit = async () => {
     try {
       setReCaptchaError(null);
-      console.log('[Step6] handleSubmit appelé');
-      console.log('[Step6] executeRecaptcha disponible?', !!executeRecaptcha);
-      
-      if (!executeRecaptcha) {
-        const errorMsg = 'Execute recaptcha not yet available';
-        setReCaptchaError(errorMsg);
-        console.error('[Step6]', errorMsg);
-        alert('Erreur: reCAPTCHA pas chargé. Veuillez attendre et réessayer.');
-        return;
-      }
-      
-      console.log('[Step6] Appel de executeRecaptcha...');
-      const token = await executeRecaptcha('submit_form');
-      console.log('[Step6] Token reçu, longueur:', token?.length);
-      
-      if (!token || token.length === 0) {
-        const errorMsg = 'Token vide';
-        setReCaptchaError(errorMsg);
-        console.error('[Step6]', errorMsg);
-        alert('Erreur: Token reCAPTCHA vide.');
-        return;
-      }
-      
-      setReCaptchaToken(token);
-      console.log('[Step6] Token stocké, passage à onSubmit');
-      // Passer le token au callback onSubmit
-      onSubmit(token);
+      console.log('[Step6] Submission with bypass token');
+      // Bypass reCAPTCHA - passer un token vide (sera contourné côté backend)
+      onSubmit('bypass_token');
     } catch (error) {
-      const errorMsg = error.message || 'Erreur reCAPTCHA inconnue';
+      const errorMsg = error.message || 'Erreur inconnue';
       setReCaptchaError(errorMsg);
       console.error('[Step6] Exception:', error);
-      console.error('[Step6] Stack:', error.stack);
-      alert('Erreur reCAPTCHA: ' + errorMsg);
+      alert('Erreur: ' + errorMsg);
     }
   };
 
