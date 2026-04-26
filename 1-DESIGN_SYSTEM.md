@@ -25,8 +25,8 @@ Ces variables s'appliquent à **tous les projets**. Adaptez-les selon vos besoin
 ### Couleurs
 
 ```
-Primaire:      #6366f1  (Indigo)
-Secondaire:    #8b5cf6  (Violet)
+Primaire:      #007bff (bleu)
+Secondaire:    #28a745  (Vert)
 Succès:        #10b981  (Vert)
 Danger:        #ef4444  (Rouge)
 Warning:       #f59e0b  (Orange)
